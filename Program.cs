@@ -9,7 +9,7 @@ List<Plant> plants = new List<Plant>()
     new Plant()
     {
         Species = "Tulip",
-        LightNeeds = 5,
+        LightNeeds = 3,
         AskingPrice = 5.50M,
         City = "Columbia",
         Zip = 38401,
@@ -39,7 +39,7 @@ List<Plant> plants = new List<Plant>()
     new Plant()
     {
         Species = "Daffodil",
-        LightNeeds = 5,
+        LightNeeds = 2,
         AskingPrice = 5.75M,
         City = "Hohenwald",
         Zip = 38462,
@@ -142,7 +142,8 @@ void DisplayAllPlants()
     for (int i = 0; i < plants.Count; i++)
     {
         Plant allPlants = plants[i];
-        Console.WriteLine(@$"{i + 1}.{allPlants.Species} in {allPlants.City} {(allPlants.Sold ? "was sold!" : $"is available for ${allPlants.AskingPrice}!")}  ");
+        string plantDetails = PlantDetails(allPlants);
+        Console.WriteLine($"{i + 1}. {plantDetails}");
     }
 }
 void PostAPlantForAdoption()
@@ -164,27 +165,57 @@ void PostAPlantForAdoption()
     Console.WriteLine("Zip: ");
     int zip = int.Parse(Console.ReadLine());
 
+    // Console.WriteLine("Available Until - Year:");
+    // int year = int.Parse(Console.ReadLine());
+
+    // Console.WriteLine("Month:");
+    // int month = int.Parse(Console.ReadLine());
+
+    // Console.WriteLine("Day:");
+    // int day = int.Parse(Console.ReadLine());
+
+    // DateTime availableUntil = new DateTime(year, month, day);
+
+    // ...
+
     Console.WriteLine("Available Until - Year:");
-    int year = int.Parse(Console.ReadLine());
-
-    Console.WriteLine("Month:");
-    int month = int.Parse(Console.ReadLine());
-
-    Console.WriteLine("Day:");
-    int day = int.Parse(Console.ReadLine());
-
-    DateTime availableUntil = new DateTime(year, month, day);
-
-    plants.Add(new Plant()
+    if (int.TryParse(Console.ReadLine(), out int year) && year >= DateTime.Now.Year)
     {
-        Species = species,
-        LightNeeds = lightNeeds,
-        AskingPrice = askingPrice,
-        City = city,
-        Zip = zip,
-        Sold = false,
-        AvailableUntil = availableUntil
-    });
+        Console.WriteLine("Month:");
+        if (int.TryParse(Console.ReadLine(), out int month) && month >= 1 && month <= 12)
+        {
+            Console.WriteLine("Day:");
+            if (int.TryParse(Console.ReadLine(), out int day) && day >= 1 && day <= DateTime.DaysInMonth(year, month))
+            {
+                DateTime availableUntil = new DateTime(year, month, day);
+
+                plants.Add(new Plant()
+                {
+                    Species = species,
+                    LightNeeds = lightNeeds,
+                    AskingPrice = askingPrice,
+                    City = city,
+                    Zip = zip,
+                    Sold = false,
+                    AvailableUntil = availableUntil
+                });
+            }
+            else
+            {
+                Console.WriteLine("Invalid day input or date not found.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid month input.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Invalid year input.");
+    }
+    // ...
+
 
 };
 void AdoptAPlant()
@@ -262,7 +293,7 @@ void PlantOfTheDay()
         }
     }
 
-    Console.WriteLine($"Plant of the Day: {randomPlant.Species} in {randomPlant.City} is available for ${randomPlant.AskingPrice}!");
+    Console.WriteLine($"Plant of the Day: {PlantDetails(randomPlant)}");
 }
 // Searching for plants by Light Needed
 void SearchForPlants()
@@ -322,8 +353,6 @@ void ViewPlantStatistics()
     Console.WriteLine($"Number of Plants Not Sold and Still Available: {notSoldAndAvailableCount}");
     Plant highestLightNeed = plants[0];
 
-
-
     for (int i = 1; i < plants.Count; i++)
     {
         if (plants[i].LightNeeds > highestLightNeed.LightNeeds)
@@ -333,9 +362,38 @@ void ViewPlantStatistics()
     }
 
     Console.WriteLine($"Plant with the highest need for light: {highestLightNeed.Species} ");
+    int totalLightNeeds = 0;
+    foreach (Plant plant in plants)
+    {
+        totalLightNeeds += plant.LightNeeds;
+    }
+
+    // Calculate the average by dividing the total by the number of plants
+    double averageLightNeeds = (double)totalLightNeeds / plants.Count;
+
+    Console.WriteLine($"Average Light Needs for All Plants: {averageLightNeeds:F2}");
+
+    int totalPlants = plants.Count;
+
+    // Calculate the number of adopted (sold) plants
+    int adoptedPlants = plants.Count(plant => plant.Sold);
+
+    // Calculate the percentage of plants adopted
+    double adoptionPercentage = (double)adoptedPlants / totalPlants * 100;
+
+    Console.WriteLine($"Percentage of Plants Adopted: {adoptionPercentage:F2}%");
+
 
 }
+string PlantDetails(Plant plant)
+{
+    string plantString = $"Species: {plant.Species}, " +
+                        $"Light Needs: {plant.LightNeeds}, " +
+                        $"Asking Price: {plant.AskingPrice}, " +
+                        $"City: {plant.City}, " +
+                        $"Zip: {plant.Zip}, " +
+                        $"Sold: {(plant.Sold ? "Yes" : "No")}, " +
+                        $"Available Until: {plant.AvailableUntil:yyyy-MM-dd}";
 
-
-
-
+    return plantString;
+}
