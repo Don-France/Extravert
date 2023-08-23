@@ -8,7 +8,7 @@ List<Plant> plants = new List<Plant>()
 {
     new Plant()
     {
-        Species = "Tulip",
+        Species = "Tulips",
         LightNeeds = 3,
         AskingPrice = 5.50M,
         City = "Columbia",
